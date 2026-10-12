@@ -3,4 +3,6 @@
 
 bool mpuInit();
 
+bool mpuCalibrate();
+
 float mpuUpdate();

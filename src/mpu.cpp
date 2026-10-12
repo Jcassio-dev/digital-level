@@ -13,6 +13,7 @@ constexpr uint8_t DLPF_44HZ      = 0x03;
 constexpr float   ACCEL_LSB_PER_G = 16384.0f;
 constexpr int     AVG_SAMPLES = 4;
 
+static float angleZero = 0.0f;
 static float filtAngle = 0.0f;
 static float shownAngle = 0.0f;
 
@@ -54,7 +55,7 @@ static bool readAccelAvg(float out[3], int n = AVG_SAMPLES) {
 static float rawAngle(const float a[3]) {
   float vert = VERT_SIGN * a[VERT_AXIS];
   float tilt = TILT_SIGN * a[TILT_AXIS];
-  return atan2f(tilt, vert) * 180.0f / PI + ANGLE_OFFSET;
+  return atan2f(tilt, vert) * 180.0f / PI;
 }
 
 bool mpuInit() {
@@ -78,12 +79,25 @@ bool mpuInit() {
   // filtro digital ~44 Hz (rápido, o filtro adaptativo cuida do ruído)
   mpuWrite(REG_CONFIG, DLPF_44HZ);
   delay(300);
+  return true;
+}
 
-  float a[3];
-  if (readAccelAvg(a, 8)) {
-    filtAngle = rawAngle(a);
-    shownAngle = filtAngle;
+bool mpuCalibrate() {
+  float sum = 0;
+  int n = 0;
+  uint32_t t0 = millis();
+  while (millis() - t0 < CALIB_DURATION_MS) {
+    float a[3];
+    if (readAccelAvg(a)) {
+      sum += rawAngle(a);
+      n++;
+    }
+    delay(5);
   }
+  if (!n) return false;
+
+  angleZero = sum / n;
+  filtAngle = shownAngle = 0.0f;
   return true;
 }
 
@@ -93,7 +107,7 @@ bool mpuInit() {
 float mpuUpdate() {
   float a[3];
   if (readAccelAvg(a)) {
-    float raw = rawAngle(a);
+    float raw = rawAngle(a) - angleZero + ANGLE_TRIM;
     float err = raw - filtAngle;
     float ae = fabsf(err);
 

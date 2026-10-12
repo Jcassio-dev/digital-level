@@ -10,8 +10,12 @@ void setup() {
     while (true) delay(100);
   }
 
+  displayShowCalibrating();
   if (!mpuInit()) {
     while (true) delay(100);
+  }
+  if (!mpuCalibrate()) {
+    Serial.println("Calibracao falhou: sem leituras do MPU");
   }
 }
 

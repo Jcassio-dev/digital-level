@@ -21,7 +21,8 @@ constexpr float VERT_SIGN = 1.0f;    // -1.0f se o sensor estiver de cabeça pra
 constexpr int   TILT_AXIS = 1;       // eixo que muda ao inclinar (troque 1 <-> 0 se medir o lado errado)
 constexpr float TILT_SIGN = 1.0f;    // -1.0f se o sinal sair invertido
 
-constexpr float ANGLE_OFFSET = -0.9f;
+constexpr uint32_t CALIB_DURATION_MS = 2000;
+constexpr float ANGLE_TRIM = 0.0f;            // ajuste fino manual (graus), somado após a calibração
 
 // ---------- Filtro adaptativo ----------
 // erro grande  -> segue rápido (resposta ágil)

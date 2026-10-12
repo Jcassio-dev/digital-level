@@ -19,6 +19,15 @@ bool displayInit() {
   return true;
 }
 
+void displayShowCalibrating() {
+  display.clearDisplay();
+  display.setTextColor(SH110X_WHITE);
+  display.setTextSize(1);
+  display.setCursor(20, 28);
+  display.print("Calibrando...");
+  display.display();
+}
+
 void displayDrawGauge(float ang) {
   display.clearDisplay();
 
